@@ -1,0 +1,41 @@
+{
+  "name": "trading-dashboard",
+  "private": true,
+  "packageManager": "npm@10.9.3",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck",
+    "db:generate": "turbo db:generate --filter=@trading/db",
+    "db:push": "turbo db:push --filter=@trading/db",
+    "db:seed": "turbo db:seed --filter=@trading/db",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^9",
+    "eslint": "^9",
+    "husky": "^9",
+    "lint-staged": "^15",
+    "prettier": "^3",
+    "turbo": "^2",
+    "typescript": "^5",
+    "typescript-eslint": "^8",
+    "vitest": "^3"
+  }
+}
