@@ -27,14 +27,49 @@ A full-stack trading dashboard for managing IPO orders through a multi-stage pip
     ├── turbo.json
     └── vitest.workspace.ts
 
+## Prerequisites
+
+- **Node.js** >= 18 (tested with v22)
+- **npm** >= 10
+
 ## Quick Start
 
 ```bash
+# 1. Install dependencies
 npm install
+
+# 2. Create the SQLite database and seed it with demo data
 npm run db:push
 npm run db:seed
+
+# 3. Start the dev server
 npm run dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Demo Accounts
+
+The seed script creates two users and sample data (5 offers, 4 orders):
+
+| User          | Email               | Password      | Notes                          |
+| ------------- | ------------------- | ------------- | ------------------------------ |
+| Alice Johnson | `alice@example.com` | `password123` | Has 4 orders at various stages |
+| Bob Smith     | `bob@example.com`   | `password123` | No orders yet                  |
+
+### Available Scripts
+
+| Command             | Description                                     |
+| ------------------- | ----------------------------------------------- |
+| `npm run dev`       | Start the dev server (Next.js + API on :3000)   |
+| `npm run build`     | Production build                                |
+| `npm test`          | Run all unit/integration tests (Vitest)         |
+| `npm run e2e`       | Run E2E tests (Playwright, requires dev server) |
+| `npm run lint`      | Lint all packages                               |
+| `npm run typecheck` | Type-check all packages                         |
+| `npm run format`    | Format all files with Prettier                  |
+| `npm run db:push`   | Push schema to SQLite database                  |
+| `npm run db:seed`   | Seed database with demo data                    |
 
 ## Order Pipeline
 
