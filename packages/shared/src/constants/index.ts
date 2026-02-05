@@ -7,4 +7,4 @@ export {
   isValidTransition,
   getStageIndex,
   isTerminalStage,
-} from './constants';
+} from './stages';
