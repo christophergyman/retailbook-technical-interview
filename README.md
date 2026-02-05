@@ -12,7 +12,7 @@ A full-stack trading dashboard for managing IPO orders through a multi-stage pip
 | Database   | SQLite + Drizzle ORM                                |
 | Auth       | Better Auth (email/password)                        |
 | Validation | TypeBox (shared schemas)                            |
-| Testing    | Vitest (workspace-wide)                             |
+| Testing    | Vitest (unit/integration) + Playwright (E2E)        |
 | Logging    | Pino (structured JSON in prod, pretty-print in dev) |
 
 ## Project Structure
@@ -42,11 +42,34 @@ Orders progress through stages: **Pending Review → Compliance Check → Approv
 
 ## Testing
 
+### Unit & Integration Tests
+
 ```bash
-npm test              # Run all tests
+npm test              # Run all tests via Turbo
 npx vitest run        # Run with Vitest directly
 npx vitest --coverage # Run with coverage report
 ```
+
+133 tests across 4 packages (shared, logger, db, api) covering schemas, stage logic, middleware, services, and API routes.
+
+### E2E Tests (Playwright)
+
+```bash
+cd apps/web
+npm run e2e           # Run all E2E tests (headless)
+npm run e2e:ui        # Run with Playwright UI mode
+```
+
+14 tests across 4 spec files:
+
+| Spec                 | Tests                                                 |
+| -------------------- | ----------------------------------------------------- |
+| `auth.spec.ts`       | Home page, login, bad credentials, register, sign out |
+| `offers.spec.ts`     | Offer list, detail page, buy form visibility          |
+| `order-flow.spec.ts` | Place order, verify in dashboard                      |
+| `dashboard.spec.ts`  | Stat cards, orders table, order detail, auth guard    |
+
+Requires the dev server running on `http://localhost:3000` (auto-started by Playwright if not already running).
 
 ## AI Usage & Engineering Decisions
 
@@ -67,7 +90,7 @@ This project was built with AI assistance (Claude Code). Below is a summary of w
 - **Stage transition model**: Designed the order pipeline (PENDING_REVIEW → SETTLED with REJECTED from any stage) based on real IPO workflows
 - **Auth strategy**: Selected Better Auth for built-in session management, avoiding JWT complexity for this use case
 - **Error hierarchy**: Designed AppError subclasses to map cleanly to HTTP status codes
-- **Test strategy**: Prioritized integration tests over unit tests for routes (tests hit real middleware + services + DB), supplemented with unit tests for schemas and stage logic
+- **Test strategy**: Prioritized integration tests over unit tests for routes (tests hit real middleware + services + DB), supplemented with unit tests for schemas and stage logic. Added Playwright E2E tests for full user flow verification against the running app
 - **Logging levels**: Separated error vs warn for server errors (5xx) vs client errors (4xx) in error handler
 
 ### Key Trade-offs

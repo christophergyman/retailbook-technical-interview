@@ -67,3 +67,13 @@
 **Response summary**: AI generated additional test files covering schema validation, middleware, services, and edge cases. Enhanced logger package with createChildLogger and logBusinessEvent helpers. Added query duration tracking to DB client.
 
 **What I did with it**: Reviewing and merging. Tests validate critical business logic paths.
+
+---
+
+## Session 8 — Playwright E2E Tests
+
+**Prompt**: Add Playwright E2E tests to verify all frontend pages and user flows work correctly against the real running app. Cover auth (login, register, bad credentials, sign out), offers (list, detail, buy form), order flow (place order, verify in dashboard), and dashboard (stats, table, order detail, auth guard).
+
+**Response summary**: AI installed Playwright with Chromium, created config and 4 spec files with 14 tests. Key challenges were handling dual "Sign In" links (header + body) requiring scoped selectors, client-side data fetching requiring extended timeouts, and correct ticker symbols from seed data. Test timeout set to 60s to accommodate login + data fetch latency.
+
+**What I did with it**: Accepted after iterating on timeout tuning and selector fixes. All 14 E2E tests pass alongside 133 unit tests.

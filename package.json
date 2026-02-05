@@ -15,6 +15,7 @@
     "db:generate": "turbo db:generate --filter=@trading/db",
     "db:push": "turbo db:push --filter=@trading/db",
     "db:seed": "turbo db:seed --filter=@trading/db",
+    "e2e": "npm run e2e --prefix apps/web",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "prepare": "husky"
   },

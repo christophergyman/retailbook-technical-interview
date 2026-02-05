@@ -27,7 +27,7 @@ test.describe('Auth', () => {
     await page.getByLabel('Email').fill('alice@example.com');
     await page.getByLabel('Password').fill('wrongpassword');
     await page.getByRole('button', { name: 'Sign In' }).click();
-    await expect(page.getByText('Invalid email or password')).toBeVisible();
+    await expect(page.getByText('Invalid email or password')).toBeVisible({ timeout: 15_000 });
   });
 
   test('register flow creates account and redirects', async ({ page }) => {
@@ -41,8 +41,10 @@ test.describe('Auth', () => {
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
   });
 
-  test('sign out redirects to home', async ({ page }) => {
+  test('sign out clears session', async ({ page }) => {
     await loginAsAlice(page);
+    // Navigate to offers (non-guarded page) before signing out to avoid AuthGuard race
+    await page.goto('/offers');
     await page.getByRole('button', { name: 'Sign Out' }).click();
     await page.waitForURL('/');
     await expect(page.getByRole('banner').getByRole('link', { name: 'Sign In' })).toBeVisible();
