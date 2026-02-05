@@ -33,6 +33,23 @@ describe('GET /api/offers', () => {
   });
 });
 
+describe('GET /api/offers?sector=...', () => {
+  it('filters by sector', async () => {
+    const res = await app.request('/api/offers?sector=Technology');
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.length).toBe(1);
+    expect(body[0].sector).toBe('Technology');
+  });
+
+  it('returns empty array when sector does not match any open offers', async () => {
+    const res = await app.request('/api/offers?sector=Healthcare');
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.length).toBe(0);
+  });
+});
+
 describe('GET /api/offers/:id', () => {
   it('returns offer details', async () => {
     const res = await app.request(`/api/offers/${seed.openOfferId}`);

@@ -48,7 +48,9 @@ export function errorHandler(err: Error, c: Context<AppEnv>) {
 
   if (err instanceof AppError) {
     if (err.statusCode >= 500) {
-      log.error({ err, requestId }, err.message);
+      log.error({ err, requestId, code: err.code }, err.message);
+    } else {
+      log.warn({ requestId, code: err.code, statusCode: err.statusCode }, err.message);
     }
     return c.json({ error: err.message, code: err.code, requestId }, err.statusCode as 400);
   }

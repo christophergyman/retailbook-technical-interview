@@ -1,4 +1,4 @@
-import { createLogger } from '@trading/logger';
+import { createLogger, logBusinessEvent } from '@trading/logger';
 import { factory } from '../factory';
 import { listOffers, getOffer } from '../services/offer.service';
 
@@ -13,10 +13,12 @@ app.get('/', (c) => {
 
   const result = listOffers(db, { status, sector });
 
-  log.info(
-    { status, sector, count: result.length, requestId: c.get('requestId') },
-    'offers listed',
-  );
+  logBusinessEvent(log, 'offers_listed', {
+    status,
+    sector,
+    count: result.length,
+    requestId: c.get('requestId'),
+  });
 
   return c.json(result);
 });
@@ -27,7 +29,10 @@ app.get('/:id', (c) => {
 
   const result = getOffer(db, id);
 
-  log.info({ offerId: id, requestId: c.get('requestId') }, 'offer accessed');
+  logBusinessEvent(log, 'offer_accessed', {
+    offerId: id,
+    requestId: c.get('requestId'),
+  });
 
   return c.json(result);
 });

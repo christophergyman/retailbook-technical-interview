@@ -102,6 +102,25 @@ describe('GET /api/orders', () => {
     expect(body.length).toBe(0);
   });
 
+  it('filters by stage query param', async () => {
+    const res = await app.request('/api/orders?stage=PENDING_REVIEW', {
+      headers: authHeader(seed.user1Id),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.length).toBe(1);
+    expect(body[0].stage).toBe('PENDING_REVIEW');
+  });
+
+  it('returns empty with non-matching stage filter', async () => {
+    const res = await app.request('/api/orders?stage=SETTLED', {
+      headers: authHeader(seed.user1Id),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.length).toBe(0);
+  });
+
   it('returns 401 unauthenticated', async () => {
     const res = await app.request('/api/orders');
     expect(res.status).toBe(401);
@@ -127,6 +146,15 @@ describe('GET /api/orders/:id', () => {
       headers: authHeader(seed.user2Id),
     });
     expect(res.status).toBe(404);
+  });
+
+  it('returns 404 for non-existent order', async () => {
+    const res = await app.request('/api/orders/nonexistent-order-id', {
+      headers: authHeader(seed.user1Id),
+    });
+    expect(res.status).toBe(404);
+    const body = await res.json();
+    expect(body.code).toBe('NOT_FOUND');
   });
 });
 
@@ -180,5 +208,54 @@ describe('PATCH /api/orders/:id/stage', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.stage).toBe('REJECTED');
+  });
+
+  it('transitions through full pipeline', async () => {
+    // Create a new order
+    const createRes = await app.request('/api/orders', {
+      method: 'POST',
+      headers: { ...authHeader(seed.user1Id), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ offerId: seed.openOfferId, sharesRequested: 2 }),
+    });
+    const order = await createRes.json();
+
+    const stages = ['COMPLIANCE_CHECK', 'APPROVED', 'ALLOCATED', 'SETTLED'];
+    for (const stage of stages) {
+      const res = await app.request(`/api/orders/${order.id}/stage`, {
+        method: 'PATCH',
+        headers: { ...authHeader(seed.user1Id), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ toStage: stage }),
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.stage).toBe(stage);
+    }
+  });
+
+  it('stores note in transition history', async () => {
+    await app.request(`/api/orders/${seed.orderId}/stage`, {
+      method: 'PATCH',
+      headers: { ...authHeader(seed.user1Id), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ toStage: 'COMPLIANCE_CHECK', note: 'Looks good' }),
+    });
+    const history = db
+      .select()
+      .from(orderStageHistory)
+      .where(eq(orderStageHistory.orderId, seed.orderId))
+      .all();
+    const transition = history.find((h) => h.toStage === 'COMPLIANCE_CHECK');
+    expect(transition).toBeDefined();
+    expect(transition!.note).toBe('Looks good');
+  });
+
+  it('rejects non-existent offer in order creation', async () => {
+    const res = await app.request('/api/orders', {
+      method: 'POST',
+      headers: { ...authHeader(seed.user1Id), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ offerId: 'nonexistent-offer', sharesRequested: 1 }),
+    });
+    expect(res.status).toBe(404);
+    const body = await res.json();
+    expect(body.code).toBe('NOT_FOUND');
   });
 });

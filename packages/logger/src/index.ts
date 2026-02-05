@@ -16,4 +16,12 @@ export function createLogger(name: string) {
 
 export type Logger = ReturnType<typeof createLogger>;
 
+export function createChildLogger(parent: Logger, bindings: Record<string, unknown>) {
+  return parent.child(bindings);
+}
+
+export function logBusinessEvent(log: Logger, event: string, data: Record<string, unknown> = {}) {
+  log.info({ event, ...data }, event);
+}
+
 export const logger = createLogger('trading-dashboard');

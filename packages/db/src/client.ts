@@ -12,11 +12,20 @@ log.debug({ dbPath: path.resolve(dbPath) }, 'opening database');
 const sqlite = new Database(dbPath);
 sqlite.pragma('journal_mode = WAL');
 
+let queryStart = 0;
+
+const originalPrepare = sqlite.prepare.bind(sqlite);
+sqlite.prepare = function trackedPrepare(sql: string) {
+  queryStart = performance.now();
+  return originalPrepare(sql);
+} as typeof sqlite.prepare;
+
 export const db = drizzle(sqlite, {
   schema,
   logger: {
     logQuery(query, params) {
-      log.debug({ query, params }, 'executing query');
+      const durationMs = Math.round((performance.now() - queryStart) * 100) / 100;
+      log.debug({ query, params, durationMs }, 'query executed');
     },
   },
 });

@@ -1,103 +1,78 @@
-# TradeFlow — Pre-IPO Trading Dashboard
+# RetailBook — IPO Order Management Platform
 
-A pre-IPO trading dashboard where users can browse upcoming IPO offers, place share purchase orders, and track their orders through a multi-stage pipeline from submission to settlement.
+A full-stack trading dashboard for managing IPO orders through a multi-stage pipeline.
 
 ## Tech Stack
 
-| Layer         | Technology              | Purpose                                                   |
-| ------------- | ----------------------- | --------------------------------------------------------- |
-| Monorepo      | Turborepo               | Workspace-based monorepo with task orchestration          |
-| Frontend      | Next.js 15 (App Router) | React framework with server components                    |
-| API           | Hono                    | Lightweight, type-safe API framework with factory pattern |
-| ORM           | Drizzle ORM             | Type-safe SQL ORM with drizzle-kit migrations             |
-| Validation    | TypeBox                 | Shared JSON schemas between API and frontend              |
-| Auth          | Better Auth             | Email/password authentication                             |
-| Data Fetching | TanStack Query          | Client-side data fetching and caching                     |
-| Database      | SQLite (better-sqlite3) | Zero-config embedded database                             |
-| Logging       | Pino                    | Structured JSON logging                                   |
-| Testing       | Vitest                  | Unit and integration testing                              |
-| Styling       | Tailwind CSS v4         | Utility-first CSS framework                               |
+| Layer      | Technology                                          |
+| ---------- | --------------------------------------------------- |
+| Monorepo   | Turborepo + npm workspaces                          |
+| Frontend   | Next.js 15 + TanStack Query + Tailwind CSS v4       |
+| API        | Hono (lightweight Node.js framework)                |
+| Database   | SQLite + Drizzle ORM                                |
+| Auth       | Better Auth (email/password)                        |
+| Validation | TypeBox (shared schemas)                            |
+| Testing    | Vitest (workspace-wide)                             |
+| Logging    | Pino (structured JSON in prod, pretty-print in dev) |
 
-## Getting Started
+## Project Structure
 
-### Prerequisites
+    ├── apps/
+    │   └── web/                  # Next.js frontend
+    ├── packages/
+    │   ├── shared/               # TypeBox schemas, stage constants
+    │   ├── logger/               # Pino logger configuration
+    │   ├── db/                   # Drizzle ORM schema + SQLite
+    │   └── api/                  # Hono API routes + middleware
+    ├── turbo.json
+    └── vitest.workspace.ts
 
-- Node.js 18+
-- npm 9+
-
-### Installation
+## Quick Start
 
 ```bash
 npm install
-cp .env.example .env
 npm run db:push
 npm run db:seed
 npm run dev
 ```
 
-The app will be available at [http://localhost:3000](http://localhost:3000).
+## Order Pipeline
 
-### Environment Variables
+Orders progress through stages: **Pending Review → Compliance Check → Approved → Allocated → Settled**. Orders can be **Rejected** from any non-terminal stage.
 
-See `.env.example` for all required environment variables.
+## Testing
 
-## Project Structure
-
-```
-trading-dashboard/
-├── apps/
-│   └── web/                 # Next.js frontend application
-├── packages/
-│   ├── api/                 # Hono API server
-│   ├── db/                  # Drizzle ORM schemas and migrations
-│   ├── shared/              # Shared types, schemas, constants
-│   └── logger/              # Pino structured logger
-├── turbo.json               # Turborepo task configuration
-├── tsconfig.base.json       # Shared TypeScript config
-├── eslint.config.mjs        # ESLint v9 flat config
-├── .prettierrc              # Prettier config
-├── vitest.workspace.ts      # Vitest workspace config
-└── .husky/pre-commit        # Pre-commit hooks
+```bash
+npm test              # Run all tests
+npx vitest run        # Run with Vitest directly
+npx vitest --coverage # Run with coverage report
 ```
 
-## Scripts
+## AI Usage & Engineering Decisions
 
-| Command               | Description                        |
-| --------------------- | ---------------------------------- |
-| `npm run dev`         | Start all apps in development mode |
-| `npm run build`       | Build all apps and packages        |
-| `npm run lint`        | Lint all workspaces                |
-| `npm run typecheck`   | Type-check all workspaces          |
-| `npm run test`        | Run all tests                      |
-| `npm run format`      | Format all files with Prettier     |
-| `npm run db:generate` | Generate Drizzle migrations        |
-| `npm run db:push`     | Push schema to database            |
-| `npm run db:seed`     | Seed database with sample data     |
+This project was built with AI assistance (Claude Code). Below is a summary of where AI was used and where manual engineering judgment was applied.
 
-## AI Usage
+### Where AI Was Used
 
-This project was built with AI assistance using [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
+- **Scaffolding**: Monorepo setup, configs, boilerplate — AI-generated, manually verified
+- **Schema design**: TypeBox schemas and Drizzle ORM tables — AI-generated based on requirements
+- **API routes**: Hono middleware and service layer — AI-generated, architecture reviewed
+- **Frontend components**: React components, hooks, pages — AI-generated with design review
+- **Test suite**: Test files and helpers — AI-generated, coverage gaps identified manually
+- **Dark mode**: Systematic dark: variant additions — AI-generated, excellent for repetitive work
 
-### Claude Code Skills
+### Where Manual Judgment Was Applied
 
-Three agent skills are installed in `.claude/skills/` to guide code generation:
+- **Architecture decisions**: Chose Hono over Express for lightweight API, SQLite for simplicity, TypeBox over Zod for runtime performance
+- **Stage transition model**: Designed the order pipeline (PENDING_REVIEW → SETTLED with REJECTED from any stage) based on real IPO workflows
+- **Auth strategy**: Selected Better Auth for built-in session management, avoiding JWT complexity for this use case
+- **Error hierarchy**: Designed AppError subclasses to map cleanly to HTTP status codes
+- **Test strategy**: Prioritized integration tests over unit tests for routes (tests hit real middleware + services + DB), supplemented with unit tests for schemas and stage logic
+- **Logging levels**: Separated error vs warn for server errors (5xx) vs client errors (4xx) in error handler
 
-| Skill                         | Source                                                                  | Purpose                                                       |
-| ----------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------- |
-| `vercel-react-best-practices` | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | React/Next.js performance patterns (57 rules)                 |
-| `web-design-guidelines`       | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | Web Interface Guidelines compliance                           |
-| `frontend-design`             | [anthropics/skills](https://github.com/anthropics/skills)               | Typography, color, motion, and spatial composition guidelines |
+### Key Trade-offs
 
-### Other AI Artifacts
-
-- `PROMPTS.md` — AI conversation transcript
-- `.ai-reviews/` — Automated AI code reviews on each commit
-- Commit messages indicate AI-assisted vs manually written code
-
-## Design Decisions
-
-- **SQLite** for zero-config local development — no external database dependency
-- **Stage history as a separate audit table** for data integrity and full audit trail
-- **TypeBox schemas shared between API and frontend** for a single source of truth on validation
-- **Hono factory pattern** for composable, typed route handlers with shared context
-- **Turborepo** for efficient task orchestration and caching across the monorepo
+1. **SQLite vs Postgres**: Chose SQLite for zero-config local dev. Trade-off: no concurrent writes, but acceptable for interview scope.
+2. **In-memory test DB**: Tests use `:memory:` SQLite — fast and isolated, but doesn't test migration files.
+3. **Monorepo shared types**: TypeBox schemas shared between API and frontend. Ensures type safety but adds coupling.
+4. **Service layer pattern**: Business logic in services, not route handlers. Adds a layer but makes testing and reuse easier.

@@ -1,4 +1,4 @@
-import { createLogger } from '@trading/logger';
+import { createLogger, logBusinessEvent } from '@trading/logger';
 import {
   CreateOrderSchema,
   UpdateOrderStageSchema,
@@ -27,17 +27,14 @@ app.post('/', validateBody(CreateOrderSchema), (c) => {
 
   const order = createOrder(db, user.id, body);
 
-  log.info(
-    {
-      orderId: order.id,
-      userId: user.id,
-      offerId: body.offerId,
-      shares: body.sharesRequested,
-      totalCost: order.totalCost,
-      requestId: c.get('requestId'),
-    },
-    'order_created',
-  );
+  logBusinessEvent(log, 'order_created', {
+    orderId: order.id,
+    userId: user.id,
+    offerId: body.offerId,
+    shares: body.sharesRequested,
+    totalCost: order.totalCost,
+    requestId: c.get('requestId'),
+  });
 
   return c.json(order, 201);
 });
@@ -49,10 +46,12 @@ app.get('/', (c) => {
 
   const result = listOrders(db, user.id, { stage });
 
-  log.info(
-    { userId: user.id, stage, count: result.length, requestId: c.get('requestId') },
-    'orders listed',
-  );
+  logBusinessEvent(log, 'orders_listed', {
+    userId: user.id,
+    stage,
+    count: result.length,
+    requestId: c.get('requestId'),
+  });
 
   return c.json(result);
 });
@@ -64,10 +63,11 @@ app.get('/:id', (c) => {
 
   const result = getOrderDetail(db, user.id, id);
 
-  log.info(
-    { orderId: id, userId: user.id, requestId: c.get('requestId') },
-    'order detail accessed',
-  );
+  logBusinessEvent(log, 'order_detail_accessed', {
+    orderId: id,
+    userId: user.id,
+    requestId: c.get('requestId'),
+  });
 
   return c.json(result);
 });
@@ -83,16 +83,13 @@ app.patch('/:id/stage', validateBody(UpdateOrderStageSchema), (c) => {
 
   const order = advanceOrderStage(db, user.id, id, body);
 
-  log.info(
-    {
-      orderId: id,
-      userId: user.id,
-      fromStage,
-      toStage: body.toStage,
-      requestId: c.get('requestId'),
-    },
-    'stage_changed',
-  );
+  logBusinessEvent(log, 'stage_changed', {
+    orderId: id,
+    userId: user.id,
+    fromStage,
+    toStage: body.toStage,
+    requestId: c.get('requestId'),
+  });
 
   return c.json(order);
 });
