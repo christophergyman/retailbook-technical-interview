@@ -1,15 +1,16 @@
 import { randomUUID } from 'crypto';
+import { hashPassword } from 'better-auth/crypto';
 import { createLogger } from '@trading/logger';
 import type { OrderStage } from '@trading/shared';
 import { db } from './client';
-import { users, offers, orders, orderStageHistory } from './schema';
+import { users, offers, orders, orderStageHistory, accounts } from './schema';
 
 const log = createLogger('seed');
 
-function daysAgo(days: number): string {
+function daysAgo(days: number): Date {
   const d = new Date();
   d.setDate(d.getDate() - days);
-  return d.toISOString();
+  return d;
 }
 
 function createOrderWithHistory(
@@ -50,7 +51,7 @@ function createOrderWithHistory(
   });
 }
 
-function seed() {
+async function seed() {
   log.info('seeding database...');
 
   // Users
@@ -64,7 +65,29 @@ function seed() {
     ])
     .run();
 
-  log.info('inserted 2 users');
+  // Account records (email/password)
+  const hashedPassword = await hashPassword('password123');
+
+  db.insert(accounts)
+    .values([
+      {
+        id: randomUUID(),
+        accountId: aliceId,
+        providerId: 'credential',
+        userId: aliceId,
+        password: hashedPassword,
+      },
+      {
+        id: randomUUID(),
+        accountId: bobId,
+        providerId: 'credential',
+        userId: bobId,
+        password: hashedPassword,
+      },
+    ])
+    .run();
+
+  log.info('inserted 2 users with accounts');
 
   // Offers
   const ntaiId = randomUUID();

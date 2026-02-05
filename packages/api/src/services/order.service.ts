@@ -148,7 +148,7 @@ export function advanceOrderStage(
     tx.update(orders)
       .set({
         stage: toStage,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
       })
       .where(eq(orders.id, orderId))
       .run();

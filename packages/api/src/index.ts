@@ -1,7 +1,8 @@
 import { cors } from 'hono/cors';
 import { db } from '@trading/db';
 import { factory } from './factory';
-import { correlationId, requestLogger, devAuth, errorHandler } from './middleware';
+import { auth } from './auth/setup';
+import { correlationId, requestLogger, loadSession, errorHandler } from './middleware';
 import offersRoutes from './routes/offers';
 import ordersRoutes from './routes/orders';
 import dashboardRoutes from './routes/dashboard';
@@ -16,12 +17,17 @@ app.use('*', async (c, next) => {
 });
 app.use('*', correlationId);
 app.use('*', requestLogger);
-app.use('*', cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' }));
+app.use(
+  '*',
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true,
+  }),
+);
+app.use('*', loadSession);
 
-// Dev auth — only active outside production
-if (process.env.NODE_ENV !== 'production') {
-  app.use('*', devAuth);
-}
+// Better Auth handler
+app.on(['POST', 'GET'], '/api/auth/**', (c) => auth.handler(c.req.raw));
 
 // Routes
 app.route('/api/offers', offersRoutes);

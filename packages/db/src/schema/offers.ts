@@ -14,7 +14,7 @@ export const offers = sqliteTable('offers', {
   status: text('status', { enum: ['open', 'closed'] })
     .notNull()
     .default('open'),
-  createdAt: text('created_at')
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
-    .default(sql`(current_timestamp)`),
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
 });

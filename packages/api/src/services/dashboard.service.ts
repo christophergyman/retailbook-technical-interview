@@ -48,6 +48,9 @@ export function getDashboardStats(db: DB, userId: string): DashboardStats {
     totalOrders: totalOrdersResult?.count ?? 0,
     totalInvested: Number(totalInvestedResult?.total ?? 0),
     ordersByStage,
-    recentOrders: recentOrderRows,
+    recentOrders: recentOrderRows.map((r) => ({
+      ...r,
+      createdAt: r.createdAt.toISOString(),
+    })),
   };
 }

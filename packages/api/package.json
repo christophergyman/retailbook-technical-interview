@@ -12,6 +12,7 @@
     "@trading/db": "*",
     "@trading/logger": "*",
     "@trading/shared": "*",
+    "better-auth": "^1.2.12",
     "hono": "^4.11.7"
   }
 }

@@ -6,10 +6,11 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   name: text('name').notNull(),
   emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
-  createdAt: text('created_at')
+  image: text('image'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
-    .default(sql`(current_timestamp)`),
-  updatedAt: text('updated_at')
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
-    .default(sql`(current_timestamp)`),
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
 });

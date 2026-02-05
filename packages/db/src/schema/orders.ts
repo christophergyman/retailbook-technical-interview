@@ -17,12 +17,12 @@ export const orders = sqliteTable('orders', {
   stage: text('stage', { enum: [...ORDER_STAGES] })
     .notNull()
     .default('PENDING_REVIEW'),
-  createdAt: text('created_at')
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
-    .default(sql`(current_timestamp)`),
-  updatedAt: text('updated_at')
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
-    .default(sql`(current_timestamp)`),
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
 });
 
 export const orderStageHistory = sqliteTable('order_stage_history', {
@@ -33,7 +33,7 @@ export const orderStageHistory = sqliteTable('order_stage_history', {
   fromStage: text('from_stage', { enum: [...ORDER_STAGES] }),
   toStage: text('to_stage', { enum: [...ORDER_STAGES] }).notNull(),
   note: text('note'),
-  changedAt: text('changed_at')
+  changedAt: integer('changed_at', { mode: 'timestamp_ms' })
     .notNull()
-    .default(sql`(current_timestamp)`),
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
 });
