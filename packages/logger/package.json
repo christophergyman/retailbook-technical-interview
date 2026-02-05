@@ -6,5 +6,11 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pino": "^10.3.0"
+  },
+  "devDependencies": {
+    "pino-pretty": "^13.1.3"
   }
 }
