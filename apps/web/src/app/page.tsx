@@ -18,17 +18,17 @@ export default function Home() {
   if (isPending) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue dark:border-slate-700 dark:border-t-blue" />
       </div>
     );
   }
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-      <h1 className="text-4xl font-bold tracking-tight text-slate-900">
+      <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
         Pre-IPO Trading Dashboard
       </h1>
-      <p className="mt-4 max-w-md text-lg text-slate-500">
+      <p className="mt-4 max-w-md text-lg text-slate-500 dark:text-slate-400">
         Browse upcoming IPO offers and manage your investment orders through a streamlined pipeline.
       </p>
       <div className="mt-8 flex gap-4">
@@ -40,7 +40,7 @@ export default function Home() {
         </Link>
         <Link
           href="/auth/login"
-          className="rounded-md border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+          className="rounded-md border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
         >
           Sign In
         </Link>

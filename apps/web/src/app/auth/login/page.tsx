@@ -34,14 +34,17 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto mt-12 max-w-sm">
-      <h1 className="text-2xl font-bold text-slate-900">Sign In</h1>
-      <p className="mt-2 text-sm text-slate-500">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Sign In</h1>
+      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
         Enter your credentials to access your dashboard.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+          >
             Email
           </label>
           <input
@@ -50,13 +53,16 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-blue focus:ring-1 focus:ring-blue focus:outline-none"
+            className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-blue focus:ring-1 focus:ring-blue focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             placeholder="alice@example.com"
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+          >
             Password
           </label>
           <input
@@ -65,11 +71,15 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-blue focus:ring-1 focus:ring-blue focus:outline-none"
+            className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm focus:border-blue focus:ring-1 focus:ring-blue focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
         </div>
 
-        {error && <div className="rounded-md bg-red/10 px-3 py-2 text-sm text-red">{error}</div>}
+        {error && (
+          <div className="rounded-md bg-red/10 px-3 py-2 text-sm text-red dark:bg-red/20">
+            {error}
+          </div>
+        )}
 
         <button
           type="submit"
@@ -84,7 +94,7 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
         Don&apos;t have an account?{' '}
         <Link href="/auth/register" className="font-medium text-blue hover:underline">
           Register

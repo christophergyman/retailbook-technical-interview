@@ -5,7 +5,7 @@ import { PIPELINE_STAGES, STAGE_LABELS, getStageIndex, type OrderStage } from '@
 const STAGE_COLORS = {
   completed: 'bg-emerald text-white',
   current: 'bg-blue text-white ring-2 ring-blue/30',
-  future: 'bg-slate-200 text-slate-400',
+  future: 'bg-slate-200 text-slate-400 dark:bg-slate-700 dark:text-slate-500',
   rejected: 'bg-red text-white',
 };
 
@@ -49,7 +49,7 @@ export function StageProgress({ currentStage }: { currentStage: OrderStage }) {
             {i < PIPELINE_STAGES.length - 1 && (
               <div
                 className={`mx-0.5 h-0.5 w-3 sm:w-4 ${
-                  i < currentIndex && !isRejected ? 'bg-emerald' : 'bg-slate-200'
+                  i < currentIndex && !isRejected ? 'bg-emerald' : 'bg-slate-200 dark:bg-slate-700'
                 }`}
               />
             )}

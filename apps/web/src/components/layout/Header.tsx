@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from '@/lib/auth-client';
+import { ThemeToggle } from './ThemeToggle';
 
 export function Header() {
   const router = useRouter();
@@ -34,6 +35,7 @@ export function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           {isPending ? (
             <div className="h-4 w-20 animate-pulse rounded bg-slate-600" />
           ) : user ? (
