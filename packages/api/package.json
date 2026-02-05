@@ -6,5 +6,12 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.48",
+    "@trading/db": "*",
+    "@trading/logger": "*",
+    "@trading/shared": "*",
+    "hono": "^4.11.7"
   }
 }
