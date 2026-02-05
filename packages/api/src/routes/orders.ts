@@ -6,7 +6,7 @@ import {
   type UpdateOrderStage,
 } from '@trading/shared';
 import { factory } from '../factory';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth } from '../middleware/require-auth';
 import { validateBody } from '../middleware/validate';
 import {
   createOrder,

@@ -31,11 +31,3 @@ export const loadSession = factory.createMiddleware(async (c, next) => {
 
   await next();
 });
-
-export const requireAuth = factory.createMiddleware(async (c, next) => {
-  const user = c.get('user');
-  if (!user) {
-    return c.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, 401);
-  }
-  await next();
-});

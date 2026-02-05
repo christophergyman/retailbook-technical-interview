@@ -1,6 +1,6 @@
 import { createLogger } from '@trading/logger';
 import { factory } from '../factory';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth } from '../middleware/require-auth';
 import { getDashboardStats } from '../services/dashboard.service';
 
 const log = createLogger('api:dashboard');
