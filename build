@@ -11,7 +11,12 @@ echo "==> Pushing DB schema..."
 npm run db:push
 
 echo "==> Seeding database..."
-npm run db:seed
+DB_PATH="packages/db/local.db"
+if sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM users;" 2>/dev/null | grep -q '^0$' || [ ! -f "$DB_PATH" ]; then
+  npm run db:seed
+else
+  echo "    Database already seeded, skipping."
+fi
 
 echo "==> Building project..."
 npm run build
