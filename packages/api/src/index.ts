@@ -1,13 +1,12 @@
-import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { db } from '@trading/db';
-import type { AppEnv } from './factory';
+import { factory } from './factory';
 import { correlationId, requestLogger, devAuth, errorHandler } from './middleware';
 import offersRoutes from './routes/offers';
 import ordersRoutes from './routes/orders';
 import dashboardRoutes from './routes/dashboard';
 
-const app = new Hono<AppEnv>();
+const app = factory.createApp();
 
 // Global middleware (order matters)
 app.use('*', async (c, next) => {
