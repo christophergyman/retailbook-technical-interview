@@ -5,6 +5,21 @@
   "main": "./src/index.ts",
   "scripts": {
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:seed": "tsx src/seed.ts",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@trading/logger": "*",
+    "@trading/shared": "*",
+    "better-sqlite3": "^12.6.2",
+    "drizzle-orm": "^0.45.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "drizzle-kit": "^0.31.8",
+    "tsx": "^4.21.0"
   }
 }
