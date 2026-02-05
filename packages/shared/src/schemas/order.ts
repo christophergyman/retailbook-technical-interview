@@ -34,7 +34,7 @@ export const OrderSchema = Type.Object({
   offerId: Type.String(),
   sharesRequested: Type.Integer(),
   totalCost: Type.Number(),
-  stage: Type.String(),
+  stage: OrderStageEnum,
   createdAt: Type.String(),
   updatedAt: Type.String(),
 });

@@ -3,7 +3,11 @@ import { eq, and, desc, asc } from 'drizzle-orm';
 import { orders, orderStageHistory, offers, type DB } from '@trading/db';
 import { isValidTransition, type OrderStage } from '@trading/shared';
 import type { CreateOrder, UpdateOrderStage } from '@trading/shared';
-import { NotFoundError, InvalidTransitionError } from '../middleware/error-handler';
+import {
+  NotFoundError,
+  ValidationError,
+  InvalidTransitionError,
+} from '../middleware/error-handler';
 
 export function createOrder(db: DB, userId: string, input: CreateOrder) {
   const offer = db.query.offers
@@ -17,11 +21,11 @@ export function createOrder(db: DB, userId: string, input: CreateOrder) {
   }
 
   if (offer.status !== 'open') {
-    throw new InvalidTransitionError('n/a', 'Offer is not open');
+    throw new ValidationError('Offer is not open');
   }
 
   if (offer.availableShares < input.sharesRequested) {
-    throw new InvalidTransitionError('n/a', 'Not enough available shares');
+    throw new ValidationError('Not enough available shares');
   }
 
   const totalCost = offer.pricePerShare * input.sharesRequested;
@@ -127,6 +131,17 @@ export function advanceOrderStage(
 
   if (!isValidTransition(currentStage, toStage)) {
     throw new InvalidTransitionError(currentStage, toStage);
+  }
+
+  if (toStage === 'ALLOCATED') {
+    const offer = db.query.offers
+      .findFirst({
+        where: eq(offers.id, order.offerId),
+      })
+      .sync();
+    if (offer && offer.availableShares < order.sharesRequested) {
+      throw new ValidationError('Not enough available shares for allocation');
+    }
   }
 
   const result = db.transaction((tx) => {

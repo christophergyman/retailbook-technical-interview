@@ -9,7 +9,7 @@ export const OfferSchema = Type.Object({
   pricePerShare: Type.Number(),
   totalShares: Type.Integer(),
   availableShares: Type.Integer(),
-  ipoDate: Type.String(),
+  ipoDate: Type.String({ format: 'date' }),
   status: Type.Union([Type.Literal('open'), Type.Literal('closed')]),
   createdAt: Type.String(),
 });

@@ -1,9 +1,8 @@
-import { createMiddleware } from 'hono/factory';
 import { eq } from 'drizzle-orm';
 import { users } from '@trading/db';
-import type { AppEnv } from '../factory';
+import { factory } from '../factory';
 
-export const devAuth = createMiddleware<AppEnv>(async (c, next) => {
+export const devAuth = factory.createMiddleware(async (c, next) => {
   const userId = c.req.header('x-user-id');
   if (userId) {
     const db = c.get('db');

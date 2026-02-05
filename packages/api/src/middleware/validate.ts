@@ -1,13 +1,12 @@
 import type { TSchema } from '@sinclair/typebox';
 import { TypeCompiler } from '@sinclair/typebox/compiler';
-import { createMiddleware } from 'hono/factory';
+import { factory } from '../factory';
 import { ValidationError } from './error-handler';
-import type { AppEnv } from '../factory';
 
 export function validateBody<T extends TSchema>(schema: T) {
   const compiled = TypeCompiler.Compile(schema);
 
-  return createMiddleware<AppEnv>(async (c, next) => {
+  return factory.createMiddleware(async (c, next) => {
     const body = await c.req.json();
 
     if (!compiled.Check(body)) {

@@ -30,15 +30,12 @@ export function getDashboardStats(db: DB, userId: string): DashboardStats {
   const recentOrderRows = db
     .select({
       id: orders.id,
-      userId: orders.userId,
-      offerId: orders.offerId,
+      companyName: offers.companyName,
+      ticker: offers.ticker,
       sharesRequested: orders.sharesRequested,
       totalCost: orders.totalCost,
       stage: orders.stage,
       createdAt: orders.createdAt,
-      updatedAt: orders.updatedAt,
-      companyName: offers.companyName,
-      ticker: offers.ticker,
     })
     .from(orders)
     .innerJoin(offers, eq(orders.offerId, offers.id))

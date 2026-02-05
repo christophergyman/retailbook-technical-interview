@@ -1,10 +1,9 @@
-import { createMiddleware } from 'hono/factory';
 import { createLogger } from '@trading/logger';
-import type { AppEnv } from '../factory';
+import { factory } from '../factory';
 
 const log = createLogger('api:http');
 
-export const requestLogger = createMiddleware<AppEnv>(async (c, next) => {
+export const requestLogger = factory.createMiddleware(async (c, next) => {
   const start = Date.now();
   const requestId = c.get('requestId');
 

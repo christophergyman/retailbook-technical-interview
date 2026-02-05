@@ -17,7 +17,7 @@ app.use('*', async (c, next) => {
 });
 app.use('*', correlationId);
 app.use('*', requestLogger);
-app.use('*', cors());
+app.use('*', cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' }));
 
 // Dev auth — only active outside production
 if (process.env.NODE_ENV !== 'production') {

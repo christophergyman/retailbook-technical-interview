@@ -1,7 +1,6 @@
-import { createMiddleware } from 'hono/factory';
-import type { AppEnv } from '../factory';
+import { factory } from '../factory';
 
-export const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
+export const requireAuth = factory.createMiddleware(async (c, next) => {
   const user = c.get('user');
   if (!user) {
     return c.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, 401);
@@ -9,6 +8,6 @@ export const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
   await next();
 });
 
-export const optionalAuth = createMiddleware<AppEnv>(async (_c, next) => {
+export const optionalAuth = factory.createMiddleware(async (_c, next) => {
   await next();
 });
