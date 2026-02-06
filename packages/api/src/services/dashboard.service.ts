@@ -1,8 +1,11 @@
 import { eq, desc, count, sum } from 'drizzle-orm';
 import { orders, offers, type DB } from '@trading/db';
+import type { Logger } from '@trading/logger';
+import { noopLogger } from '@trading/logger';
 import type { DashboardStats } from '@trading/shared';
 
-export function getDashboardStats(db: DB, userId: string): DashboardStats {
+export function getDashboardStats(db: DB, userId: string, log?: Logger): DashboardStats {
+  const svcLog = log ?? noopLogger();
   const totalOrdersResult = db
     .select({ count: count() })
     .from(orders)
@@ -44,7 +47,7 @@ export function getDashboardStats(db: DB, userId: string): DashboardStats {
     .limit(5)
     .all();
 
-  return {
+  const stats = {
     totalOrders: totalOrdersResult?.count ?? 0,
     totalInvested: Number(totalInvestedResult?.total ?? 0),
     ordersByStage,
@@ -53,4 +56,10 @@ export function getDashboardStats(db: DB, userId: string): DashboardStats {
       createdAt: r.createdAt.toISOString(),
     })),
   };
+
+  svcLog.debug(
+    { userId, totalOrders: stats.totalOrders, totalInvested: stats.totalInvested },
+    'dashboard stats computed',
+  );
+  return stats;
 }

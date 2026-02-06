@@ -12,7 +12,7 @@ app.get('/', (c) => {
   const db = c.get('db');
   const user = c.get('user')!;
 
-  const stats = getDashboardStats(db, user.id);
+  const stats = getDashboardStats(db, user.id, log);
 
   logBusinessEvent(log, 'dashboard_accessed', {
     userId: user.id,

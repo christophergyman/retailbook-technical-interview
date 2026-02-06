@@ -11,7 +11,7 @@ app.get('/', (c) => {
   const status = c.req.query('status');
   const sector = c.req.query('sector');
 
-  const result = listOffers(db, { status, sector });
+  const result = listOffers(db, { status, sector }, log);
 
   logBusinessEvent(log, 'offers_listed', {
     status,
@@ -27,7 +27,7 @@ app.get('/:id', (c) => {
   const db = c.get('db');
   const id = c.req.param('id');
 
-  const result = getOffer(db, id);
+  const result = getOffer(db, id, log);
 
   logBusinessEvent(log, 'offer_accessed', {
     offerId: id,

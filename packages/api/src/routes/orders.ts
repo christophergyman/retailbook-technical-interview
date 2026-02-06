@@ -25,7 +25,7 @@ app.post('/', validateBody(CreateOrderSchema), (c) => {
   const user = c.get('user')!;
   const body = c.get('validatedBody' as never) as CreateOrder;
 
-  const order = createOrder(db, user.id, body);
+  const order = createOrder(db, user.id, body, log);
 
   logBusinessEvent(log, 'order_created', {
     orderId: order.id,
@@ -44,7 +44,7 @@ app.get('/', (c) => {
   const user = c.get('user')!;
   const stage = c.req.query('stage');
 
-  const result = listOrders(db, user.id, { stage });
+  const result = listOrders(db, user.id, { stage }, log);
 
   logBusinessEvent(log, 'orders_listed', {
     userId: user.id,
@@ -61,7 +61,7 @@ app.get('/:id', (c) => {
   const user = c.get('user')!;
   const id = c.req.param('id');
 
-  const result = getOrderDetail(db, user.id, id);
+  const result = getOrderDetail(db, user.id, id, log);
 
   logBusinessEvent(log, 'order_detail_accessed', {
     orderId: id,
@@ -78,10 +78,10 @@ app.patch('/:id/stage', validateBody(UpdateOrderStageSchema), (c) => {
   const id = c.req.param('id');
   const body = c.get('validatedBody' as never) as UpdateOrderStage;
 
-  const previousOrder = getOrderDetail(db, user.id, id);
+  const previousOrder = getOrderDetail(db, user.id, id, log);
   const fromStage = previousOrder.stage;
 
-  const order = advanceOrderStage(db, user.id, id, body);
+  const order = advanceOrderStage(db, user.id, id, body, log);
 
   logBusinessEvent(log, 'stage_changed', {
     orderId: id,

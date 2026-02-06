@@ -16,6 +16,11 @@ export function createLogger(name: string) {
 
 export type Logger = ReturnType<typeof createLogger>;
 
+const NOOP = pino({ level: 'silent' });
+export function noopLogger(): Logger {
+  return NOOP;
+}
+
 export function createChildLogger(parent: Logger, bindings: Record<string, unknown>) {
   return parent.child(bindings);
 }

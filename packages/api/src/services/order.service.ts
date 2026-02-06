@@ -3,13 +3,16 @@ import { eq, and, desc, asc } from 'drizzle-orm';
 import { orders, orderStageHistory, offers, type DB } from '@trading/db';
 import { isValidTransition, type OrderStage } from '@trading/shared';
 import type { CreateOrder, UpdateOrderStage } from '@trading/shared';
+import type { Logger } from '@trading/logger';
+import { noopLogger } from '@trading/logger';
 import {
   NotFoundError,
   ValidationError,
   InvalidTransitionError,
 } from '../middleware/error-handler';
 
-export function createOrder(db: DB, userId: string, input: CreateOrder) {
+export function createOrder(db: DB, userId: string, input: CreateOrder, log?: Logger) {
+  const svcLog = log ?? noopLogger();
   const offer = db.query.offers
     .findFirst({
       where: eq(offers.id, input.offerId),
@@ -17,14 +20,24 @@ export function createOrder(db: DB, userId: string, input: CreateOrder) {
     .sync();
 
   if (!offer) {
+    svcLog.warn({ offerId: input.offerId }, 'order rejected: offer not found');
     throw new NotFoundError('Offer');
   }
 
   if (offer.status !== 'open') {
+    svcLog.warn({ offerId: input.offerId, status: offer.status }, 'order rejected: offer not open');
     throw new ValidationError('Offer is not open');
   }
 
   if (offer.availableShares < input.sharesRequested) {
+    svcLog.warn(
+      {
+        offerId: input.offerId,
+        available: offer.availableShares,
+        requested: input.sharesRequested,
+      },
+      'order rejected: insufficient shares',
+    );
     throw new ValidationError('Not enough available shares');
   }
 
@@ -66,25 +79,31 @@ export function createOrder(db: DB, userId: string, input: CreateOrder) {
       .sync()!;
   });
 
+  svcLog.info({ orderId, userId, totalCost }, 'order created');
   return result;
 }
 
-export function listOrders(db: DB, userId: string, filters: { stage?: string } = {}) {
+export function listOrders(db: DB, userId: string, filters: { stage?: string } = {}, log?: Logger) {
+  const svcLog = log ?? noopLogger();
   const conditions = [eq(orders.userId, userId)];
 
   if (filters.stage) {
     conditions.push(eq(orders.stage, filters.stage as OrderStage));
   }
 
-  return db
+  const result = db
     .select()
     .from(orders)
     .where(and(...conditions))
     .orderBy(desc(orders.createdAt))
     .all();
+
+  svcLog.debug({ userId, stage: filters.stage, count: result.length }, 'orders listed');
+  return result;
 }
 
-export function getOrderDetail(db: DB, userId: string, orderId: string) {
+export function getOrderDetail(db: DB, userId: string, orderId: string, log?: Logger) {
+  const svcLog = log ?? noopLogger();
   const row = db.query.orders
     .findFirst({
       where: and(eq(orders.id, orderId), eq(orders.userId, userId)),
@@ -98,9 +117,11 @@ export function getOrderDetail(db: DB, userId: string, orderId: string) {
     .sync();
 
   if (!row) {
+    svcLog.warn({ orderId, userId }, 'order not found');
     throw new NotFoundError('Order');
   }
 
+  svcLog.debug({ orderId, userId, stage: row.stage }, 'order detail retrieved');
   return {
     ...row,
     offer: {
@@ -115,7 +136,9 @@ export function advanceOrderStage(
   userId: string,
   orderId: string,
   input: UpdateOrderStage,
+  log?: Logger,
 ) {
+  const svcLog = log ?? noopLogger();
   const order = db.query.orders
     .findFirst({
       where: and(eq(orders.id, orderId), eq(orders.userId, userId)),
@@ -123,6 +146,7 @@ export function advanceOrderStage(
     .sync();
 
   if (!order) {
+    svcLog.warn({ orderId, userId }, 'advance stage: order not found');
     throw new NotFoundError('Order');
   }
 
@@ -130,6 +154,7 @@ export function advanceOrderStage(
   const toStage = input.toStage as OrderStage;
 
   if (!isValidTransition(currentStage, toStage)) {
+    svcLog.warn({ orderId, from: currentStage, to: toStage }, 'invalid stage transition');
     throw new InvalidTransitionError(currentStage, toStage);
   }
 
@@ -170,5 +195,6 @@ export function advanceOrderStage(
       .sync()!;
   });
 
+  svcLog.info({ orderId, from: currentStage, to: toStage }, 'order stage advanced');
   return result;
 }

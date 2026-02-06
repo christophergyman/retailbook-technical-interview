@@ -228,6 +228,66 @@ describe('validateBody middleware', () => {
   });
 });
 
+describe('auth dev-fallback (via createTestApp)', () => {
+  it('sets user when valid x-user-id header is provided', async () => {
+    const app = createMiddlewareApp();
+
+    // Simulate the dev-fallback auth from test-utils: look up user by x-user-id
+    const mockUsers: Record<string, { id: string; email: string; name: string }> = {
+      u1: { id: 'u1', email: 'alice@test.com', name: 'Alice' },
+    };
+    app.use('*', async (c, next) => {
+      const userId = c.req.header('x-user-id');
+      if (userId && mockUsers[userId]) {
+        c.set('user', mockUsers[userId]);
+      }
+      await next();
+    });
+    app.get('/test', (c) => c.json({ user: c.get('user') }));
+
+    const res = await app.request('/test', {
+      headers: { 'x-user-id': 'u1' },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.user).toEqual({ id: 'u1', email: 'alice@test.com', name: 'Alice' });
+  });
+
+  it('leaves user null when x-user-id refers to non-existent user', async () => {
+    const app = createMiddlewareApp();
+    const mockUsers: Record<string, { id: string; email: string; name: string }> = {};
+    app.use('*', async (c, next) => {
+      const userId = c.req.header('x-user-id');
+      if (userId && mockUsers[userId]) {
+        c.set('user', mockUsers[userId]);
+      }
+      await next();
+    });
+    app.get('/test', (c) => c.json({ user: c.get('user') }));
+
+    const res = await app.request('/test', {
+      headers: { 'x-user-id': 'nonexistent' },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.user).toBeNull();
+  });
+
+  it('leaves user null when no x-user-id header is provided', async () => {
+    const app = createMiddlewareApp();
+    app.use('*', async (c, next) => {
+      // No header check — simulates missing header scenario
+      await next();
+    });
+    app.get('/test', (c) => c.json({ user: c.get('user') }));
+
+    const res = await app.request('/test');
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.user).toBeNull();
+  });
+});
+
 describe('requestLogger middleware', () => {
   it('passes request through and completes', async () => {
     const app = createMiddlewareApp();
