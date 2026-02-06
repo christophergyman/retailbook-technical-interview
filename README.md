@@ -2,6 +2,8 @@
 
 A full-stack monorepo application where retail investors browse upcoming IPO offers, place orders for shares, and track those orders through a multi-stage compliance pipeline. Built as a technical interview project demonstrating end-to-end ownership across frontend, API, database, testing, CI/CD, and deployment.
 
+![Dashboard Screenshot](docs/dashboard.png)
+
 ---
 
 ## Tech Stack
