@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Providers } from '@/providers/Providers';
+import { ErrorBoundary } from '@/components/layout/ErrorBoundary';
 import { Header } from '@/components/layout/Header';
 import './globals.css';
 
@@ -28,8 +29,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
-          <Header />
-          <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">{children}</main>
+          <ErrorBoundary>
+            <Header />
+            <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">{children}</main>
+          </ErrorBoundary>
         </Providers>
       </body>
     </html>

@@ -2,11 +2,13 @@ import { createLogger, logBusinessEvent } from '@trading/logger';
 import {
   CreateOrderSchema,
   UpdateOrderStageSchema,
+  ORDER_STAGES,
   type CreateOrder,
   type UpdateOrderStage,
 } from '@trading/shared';
 import { factory } from '../factory';
 import { requireAuth } from '../middleware/require-auth';
+import { ValidationError } from '../middleware/error-handler';
 import { validateBody } from '../middleware/validate';
 import {
   createOrder,
@@ -43,6 +45,10 @@ app.get('/', (c) => {
   const db = c.get('db');
   const user = c.get('user')!;
   const stage = c.req.query('stage');
+
+  if (stage && !ORDER_STAGES.includes(stage as (typeof ORDER_STAGES)[number])) {
+    throw new ValidationError(`Invalid stage: must be one of ${ORDER_STAGES.join(', ')}`);
+  }
 
   const result = listOrders(db, user.id, { stage }, log);
 

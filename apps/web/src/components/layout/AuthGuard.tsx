@@ -17,7 +17,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   if (isPending) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue dark:border-slate-700 dark:border-t-blue" />
+        <div
+          className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue dark:border-slate-700 dark:border-t-blue"
+          role="status"
+          aria-label="Loading"
+        />
       </div>
     );
   }

@@ -73,9 +73,14 @@ export function BuyForm({ offer }: { offer: Offer }) {
         <label htmlFor="shares" className="block text-sm text-slate-600 dark:text-slate-400">
           Number of Shares
         </label>
+        <p id="shares-hint" className="sr-only">
+          Enter between 1 and {offer.availableShares.toLocaleString()} shares at{' '}
+          {formatCurrency(offer.pricePerShare)} per share
+        </p>
         <div className="mt-1 flex items-center gap-2">
           <button
             type="button"
+            aria-label="Decrease shares"
             onClick={() => setShares((s) => Math.max(1, s - 1))}
             className="flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700"
           >
@@ -87,11 +92,13 @@ export function BuyForm({ offer }: { offer: Offer }) {
             min={1}
             max={offer.availableShares}
             value={shares}
+            aria-describedby="shares-hint"
             onChange={(e) => setShares(Math.max(1, parseInt(e.target.value) || 1))}
             className="h-9 w-24 rounded-md border border-slate-200 px-3 text-center text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
           <button
             type="button"
+            aria-label="Increase shares"
             onClick={() => setShares((s) => Math.min(offer.availableShares, s + 1))}
             className="flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700"
           >

@@ -47,6 +47,7 @@ export function Header() {
                   router.push('/');
                   router.refresh();
                 }}
+                aria-label="Sign out of your account"
                 className="rounded-md bg-slate-700 px-3 py-1.5 text-sm transition-colors hover:bg-slate-600"
               >
                 Sign Out

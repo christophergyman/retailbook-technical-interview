@@ -20,12 +20,31 @@ sqlite.prepare = function trackedPrepare(sql: string) {
   return originalPrepare(sql);
 } as typeof sqlite.prepare;
 
+const SENSITIVE_FIELDS = /password|token|secret|access_token|refresh_token|id_token/i;
+
+function maskParams(params: unknown): unknown {
+  if (!Array.isArray(params)) return params;
+  return params.map((p, i) => {
+    if (typeof p === 'string' && p.length > 8 && SENSITIVE_FIELDS.test(String(i))) {
+      return '[REDACTED]';
+    }
+    return p;
+  });
+}
+
+function maskQuery(query: string): string {
+  return query.replace(/(password|token|secret)\s*=\s*'[^']*'/gi, '$1=[REDACTED]');
+}
+
 export const db = drizzle(sqlite, {
   schema,
   logger: {
     logQuery(query, params) {
       const durationMs = Math.round((performance.now() - queryStart) * 100) / 100;
-      log.debug({ query, params, durationMs }, 'query executed');
+      log.debug(
+        { query: maskQuery(query), params: maskParams(params), durationMs },
+        'query executed',
+      );
     },
   },
 });

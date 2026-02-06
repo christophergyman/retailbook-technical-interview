@@ -1,4 +1,5 @@
 import type { Context } from 'hono';
+import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import { createLogger } from '@trading/logger';
 import type { AppEnv } from '../factory';
 
@@ -52,7 +53,10 @@ export function errorHandler(err: Error, c: Context<AppEnv>) {
     } else {
       log.warn({ requestId, code: err.code, statusCode: err.statusCode }, err.message);
     }
-    return c.json({ error: err.message, code: err.code, requestId }, err.statusCode as 400);
+    return c.json(
+      { error: err.message, code: err.code, requestId },
+      err.statusCode as ContentfulStatusCode,
+    );
   }
 
   log.error({ err, requestId }, 'Unhandled error');

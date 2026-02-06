@@ -1,5 +1,67 @@
 # AI Conversation Transcript
 
+## Prompt Engineering Guidelines
+
+### How to Brief AI on This Project
+
+Point the AI at `CLAUDE.md` (for Claude Code) or `CONTEXT.md` (for other tools) before starting. These files contain the full architecture, conventions, and constraints. If using Claude Code, it picks up `CLAUDE.md` automatically.
+
+### Example Prompts That Work Well
+
+**New feature:**
+
+> Add a `PATCH /api/offers/:id` endpoint that lets admins close an offer. Create the service function in `offer.service.ts`, add the route in `offers.ts`, validate with TypeBox, and add tests.
+
+**Bug fix:**
+
+> The orders list endpoint returns orders from all users when `stage` is provided. Fix the query in `listOrders()` in `order.service.ts` to always filter by `userId`. Add a regression test.
+
+**Refactoring:**
+
+> Extract the stage transition validation from `advanceOrderStage()` into a standalone `validateTransition()` function in the shared package. Update imports in the API service and add unit tests.
+
+### Anti-patterns to Avoid
+
+- Don't say "build me an API" — be specific about which endpoints, schemas, and error cases.
+- Don't ask for a "complete rewrite" — the codebase has established patterns. Ask for incremental changes.
+- Don't skip mentioning test requirements — always ask for tests alongside code changes.
+- Don't request technologies we don't use (Zod, Express, Prisma, Redux) — see CLAUDE.md for conventions.
+
+### When to Use Which AI Tool
+
+| Task                   | Tool                    | Why                                                  |
+| ---------------------- | ----------------------- | ---------------------------------------------------- |
+| Multi-file refactoring | Claude Code             | Understands monorepo, can edit + test in one session |
+| Inline code completion | GitHub Copilot / Cursor | Fast autocomplete from context                       |
+| Code review            | Claude Code / ChatGPT   | Can analyze diffs and suggest improvements           |
+| Schema design          | Claude Code             | Can read existing schemas and maintain consistency   |
+| Debugging              | Claude Code             | Can read logs, trace errors, and fix across files    |
+
+### Templates
+
+**New Feature Request:**
+
+```
+Add [feature description].
+- Route: [METHOD /api/path]
+- Schema: [describe input/output]
+- Service: [which service file]
+- Auth: [required/not required]
+- Tests: [describe test cases]
+```
+
+**Bug Fix Request:**
+
+```
+Bug: [describe the incorrect behavior]
+Expected: [describe correct behavior]
+Location: [file:line or function name]
+Reproduce: [steps or curl command]
+Add a regression test.
+```
+
+---
+
 ## Session 1 — Project Scaffolding
 
 **Prompt**: Implement Phase 0 scaffolding — set up Turborepo monorepo with workspace packages, Next.js app, ESLint, Prettier, Husky, Vitest, and Claude Code agent skills.

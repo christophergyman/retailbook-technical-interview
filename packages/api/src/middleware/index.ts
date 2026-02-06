@@ -11,3 +11,5 @@ export {
   InvalidTransitionError,
 } from './error-handler';
 export { validateBody } from './validate';
+export { securityHeaders } from './security-headers';
+export { rateLimit } from './rate-limit';
