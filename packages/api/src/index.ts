@@ -20,7 +20,15 @@ app.use('*', requestLogger);
 app.use(
   '*',
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin) => {
+      if (process.env.NODE_ENV !== 'production') {
+        return origin;
+      }
+      const allowed = (process.env.FRONTEND_URL || 'http://localhost:3000')
+        .split(',')
+        .map((s) => s.trim());
+      return allowed.includes(origin) ? origin : allowed[0];
+    },
     credentials: true,
   }),
 );
