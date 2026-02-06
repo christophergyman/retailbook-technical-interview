@@ -71,6 +71,25 @@ Terminal stages: `SETTLED`, `REJECTED` (no further transitions).
 | E2E tests        | `apps/web/tests/*.spec.ts`                |
 | Unit tests       | `packages/*/tests/*.test.ts`              |
 
+## Known Issues
+
+### Pino `thread-stream` errors during Playwright E2E teardown
+
+When Playwright's web server process shuts down after E2E tests, the Pino `pino-pretty` transport (which runs in a separate worker thread via `thread-stream`) crashes with:
+
+```
+Error: the worker has exited
+    at <unknown> (../../packages/api/src/middleware/logger.ts:16:7)
+```
+
+and:
+
+```
+Cannot find module '/ROOT/node_modules/thread-stream/lib/worker.js'
+```
+
+**This is harmless.** It only occurs during process teardown when Playwright kills the dev server. The worker thread exits before Pino can flush its final log lines. It does not affect test results, app functionality, or production behavior (production uses JSON output, not `pino-pretty`).
+
 ## Things to Avoid
 
 - **No Express** — we use Hono

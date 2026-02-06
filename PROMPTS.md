@@ -139,3 +139,22 @@ Add a regression test.
 **Response summary**: AI installed Playwright with Chromium, created config and 4 spec files with 14 tests. Key challenges were handling dual "Sign In" links (header + body) requiring scoped selectors, client-side data fetching requiring extended timeouts, and correct ticker symbols from seed data. Test timeout set to 60s to accommodate login + data fetch latency.
 
 **What I did with it**: Accepted after iterating on timeout tuning and selector fixes. All 14 E2E tests pass alongside 133 unit tests.
+
+---
+
+## Session 9 — Production Hardening & AI-First Documentation
+
+**Prompt**: Deep code review with production hardening. 5 parallel research agents analyzed architecture, tests, logging, docs, code quality, and 2026 best practices. Then implemented a 6-phase plan covering security fixes, observability, Docker, CI/CD, AI docs, and modularity.
+
+**Response summary**: AI implemented across 23 files:
+
+- **Security**: Query param validation on offers/orders routes, security headers middleware (CSP, HSTS, X-Frame-Options), IP-based rate limiting (100 req/min), 1MB body size limit, fixed error handler type cast from `as 400` to `as ContentfulStatusCode`
+- **Observability**: React ErrorBoundary, graceful SIGTERM/SIGINT shutdown, health endpoint with DB readiness probe (`SELECT 1`), PII masking in DB query logger
+- **Infrastructure**: Multi-stage Dockerfile, docker-compose.yml with SQLite volume, .dockerignore
+- **CI/CD**: GitHub Actions CI workflow (lint + typecheck + test on PRs), E2E workflow (Playwright with artifact upload)
+- **AI docs**: CLAUDE.md (Claude Code context), CONTEXT.md (generic AI context), PROMPTS.md prompt engineering guidelines
+- **Modularity**: Barrel exports for services/routes, aria-labels and aria-describedby for WCAG accessibility
+
+**Known issue found during E2E verification**: Pino's `pino-pretty` transport (via `thread-stream`) throws `Error: the worker has exited` and `Cannot find module thread-stream/lib/worker.js` during Playwright test teardown. This is harmless — it only occurs when Playwright kills the dev server process, causing the Pino worker thread to exit before flushing final log lines. Does not affect test results or production (which uses JSON output, not `pino-pretty`). Documented in CLAUDE.md under "Known Issues".
+
+**What I did with it**: Accepted. All 14 E2E tests pass, 144 unit tests pass, lint and typecheck clean. Pre-commit hooks (lint-staged + typecheck + vitest --changed) all green.
